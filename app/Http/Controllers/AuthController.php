@@ -23,7 +23,9 @@ class AuthController extends Controller
                 'email' => $request->email,
                 'password' => bcrypt($request->password),
                 'dob' => Carbon::createFromFormat("d-m-Y",$request->dob),
-            ]);     
+            ]);
+            
+            $user->assignRole('staff');
 
             return response()->json([
                 'success' => true,

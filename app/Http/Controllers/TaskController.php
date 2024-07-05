@@ -15,9 +15,18 @@ class TaskController extends Controller
     {
         try {
 
+            $user = auth()->user();
+            if($user->hasRole('admin'))
+            {
+                return response()->json([
+                    'success' =>true,
+                    'data' => TaskResource::collection(Task::paginate(10)),
+                ]);
+            }
+
             return response()->json([
                 'success' =>true,
-                'data' => TaskResource::collection(Task::paginate(10)),
+                'data' => TaskResource::collection(Task::whereUserId(auth()->id())->paginate(10)),
             ]);
             
         } catch (\Exception $e) {
@@ -72,6 +81,11 @@ class TaskController extends Controller
 
         try {
 
+            if($task->user_id!=auth()->id())
+            {
+                return abort(403);
+            }
+
             return response()->json([
                 'success' => true,
                 'data' => $task
@@ -92,6 +106,11 @@ class TaskController extends Controller
     {
         try {
 
+            if($task->user_id!=auth()->id())
+            {
+                return abort(403);
+            }
+
             return response()->json([
                 'success' => true,
                 'data' => $task
@@ -111,6 +130,10 @@ class TaskController extends Controller
     public function update(Request $request, Task $task)
     {
         try {
+            if($task->user_id!=auth()->id())
+            {
+                return abort(403);
+            }
 
             $task  = $task->update([
                 'title' => $request->title,
@@ -136,6 +159,10 @@ class TaskController extends Controller
     public function destroy(Task $task)
     {
         try {
+            if($task->user_id!=auth()->id())
+            {
+                return abort(403);
+            }
 
             if($task->delete())
             {
